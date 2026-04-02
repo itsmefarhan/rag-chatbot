@@ -7,9 +7,11 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
 
 from config import get_llm, get_embeddings, CHUNK_SIZE, CHUNK_OVERLAP, BASE_DIR
 
@@ -26,18 +28,24 @@ _splitter = RecursiveCharacterTextSplitter(
 )
 
 # ── QA Prompt ───────────────────────────────────────────────────
-QA_PROMPT = ChatPromptTemplate.from_template(
-    """You are a helpful assistant that answers questions based on the provided context.
+QA_PROMPT = ChatPromptTemplate.from_messages([
+    ("system", """You are a helpful assistant that answers questions based on the provided context.
 Use ONLY the context below to answer the question. If the answer is not in the context, say
 "I don't have enough information in the provided documents to answer that question."
 
 Context:
-{context}
+{context}"""),
+    MessagesPlaceholder(variable_name="chat_history"),
+    ("human", "{question}")
+])
 
-Question: {question}
+# Global store for chat histories
+_store = {}
 
-Answer:"""
-)
+def get_session_history(session_id: str) -> ChatMessageHistory:
+    if session_id not in _store:
+        _store[session_id] = ChatMessageHistory()
+    return _store[session_id]
 
 
 def _collection_name(filename: str) -> str:
@@ -123,13 +131,23 @@ def query(question: str, collection_name: Optional[str] = None) -> str:
 
     # LCEL chain
     chain = (
-        {"context": retriever | _format_docs, "question": RunnablePassthrough()}
+        RunnablePassthrough.assign(context=(lambda x: x["question"]) | retriever | _format_docs)
         | QA_PROMPT
         | llm
         | StrOutputParser()
     )
 
-    result = chain.invoke(question)
+    with_message_history = RunnableWithMessageHistory(
+        chain,
+        get_session_history,
+        input_messages_key="question",
+        history_messages_key="chat_history",
+    )
+
+    result = with_message_history.invoke(
+        {"question": question},
+        config={"configurable": {"session_id": "default"}}
+    )
     return result
 
 
