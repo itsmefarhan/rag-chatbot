@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chatbot — Document Intelligence</title>
+    <meta name="description" content="AI-powered document chatbot with RAG retrieval">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <!-- ── Sidebar ────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">◈</span>
+                <h1>DocChat<span class="accent">AI</span></h1>
+            </div>
+            <button class="sidebar-toggle" id="sidebarClose" aria-label="Close sidebar">✕</button>
+        </div>
+
+        <div class="sidebar-section upload-section">
+            <h2 class="section-title">
+                <span class="section-icon">⬆️</span> Upload
+            </h2>
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+                <div class="upload-content">
+                    <span class="upload-icon">📄</span>
+                    <p class="upload-text">Drop file here or <span class="upload-link">browse</span></p>
+                    <p class="upload-hint">PDF, DOCX, TXT</p>
+                </div>
+                <div class="upload-progress" id="uploadProgress" hidden>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Processing...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h2 class="section-title">
+                <span class="section-icon">📁</span> Documents
+            </h2>
+            <div class="doc-list" id="docList">
+                <div class="doc-empty" id="docEmpty">
+                    <span class="empty-icon">📭</span>
+                    <p>No documents loaded yet</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+        </div>
+    </aside>
+
+    <!-- ── Main Content ───────────────────────────────── -->
+    <main class="main">
+        <header class="main-header">
+            <button class="sidebar-toggle mobile-toggle" id="sidebarOpen" aria-label="Open sidebar">☰</button>
+            <div class="header-info">
+                <h2 id="activeDoc">No document selected</h2>
+                <span class="header-badge" id="headerBadge" hidden>RAG Active</span>
+            </div>
+        </header>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome message -->
+                <div class="message ai-message welcome-message">
+                    <div class="message-avatar">◈</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <h3>Welcome to DocChat AI 👋</h3>
+                            <p>I'm your document intelligence assistant. Upload a document or use the pre-loaded one to
+                                start asking questions.</p>
+                            <div class="quick-actions">
+                                <button class="quick-btn" data-question="Summarize the document">📋 Summarize</button>
+                                <button class="quick-btn" data-question="What are the key points?">🔑 Key
+                                    Points</button>
+                                <button class="quick-btn" data-question="What is this document about?">📖
+                                    Overview</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <form class="chat-form" id="chatForm">
+                <div class="input-wrapper">
+                    <textarea id="chatInput" placeholder="Ask a question about your documents..." rows="1"
+                        autofocus></textarea>
+                    <button type="submit" class="send-btn" id="sendBtn" title="Send message">
+                        <span class="send-icon">➤</span>
+                    </button>
+                </div>
+            </form>
+            <p class="input-hint">Press Enter to send, Shift+Enter for new line</p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
