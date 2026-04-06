@@ -16,7 +16,7 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from config import get_llm, get_embeddings, CHUNK_SIZE, CHUNK_OVERLAP, BASE_DIR
 
 
-# ── In-memory store of collections ──────────────────────────────
+# ── In-memory store of collections! ──────────────────────────────
 _collections: dict[str, Chroma] = {}
 _doc_metadata: dict[str, dict] = {}  # collection_name -> {filename, chunk_count}
 
