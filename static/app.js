@@ -8,11 +8,11 @@ const chatInput = document.getElementById('chatInput');
 const chatMessages = document.getElementById('chatMessages');
 const chatContainer = document.getElementById('chatContainer');
 const sendBtn = document.getElementById('sendBtn');
-const fileInput = document.getElementById('fileInput');
-const uploadZone = document.getElementById('uploadZone');
-const uploadProgress = document.getElementById('uploadProgress');
-const progressFill = document.getElementById('progressFill');
-const progressText = document.getElementById('progressText');
+// const fileInput = document.getElementById('fileInput');
+// const uploadZone = document.getElementById('uploadZone');
+// const uploadProgress = document.getElementById('uploadProgress');
+// const progressFill = document.getElementById('progressFill');
+// const progressText = document.getElementById('progressText');
 const docList = document.getElementById('docList');
 const docEmpty = document.getElementById('docEmpty');
 const activeDocHeader = document.getElementById('activeDoc');
@@ -41,25 +41,26 @@ function setupEventListeners() {
     // Auto-resize textarea
     chatInput.addEventListener('input', autoResizeTextarea);
 
-    // File upload
-    uploadZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', handleFileSelect);
+    // // File upload
+    // uploadZone.addEventListener('click', () => fileInput.click());
+    // fileInput.addEventListener('change', handleFileSelect);
 
-    // Drag and drop
-    uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('dragover');
-    });
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('dragover');
-    });
-    uploadZone.addEventListener('drop', handleDrop);
+    // // Drag and drop
+    // uploadZone.addEventListener('dragover', (e) => {
+    //     e.preventDefault();
+    //     uploadZone.classList.add('dragover');
+    // });
+    // uploadZone.addEventListener('dragleave', () => {
+    //     uploadZone.classList.remove('dragover');
+    // });
+    // uploadZone.addEventListener('drop', handleDrop);
 
     // Quick action buttons
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('quick-btn')) {
             const question = e.target.dataset.question;
             if (question) {
+                // console.log(question)
                 chatInput.value = question;
                 handleSend(e);
             }
@@ -134,83 +135,83 @@ function selectDocument(collectionName, filename, element) {
 }
 
 // ── File Upload ──────────────────────────────────────────
-function handleFileSelect(e) {
-    const file = e.target.files[0];
-    if (file) uploadFile(file);
-}
+// function handleFileSelect(e) {
+//     const file = e.target.files[0];
+//     if (file) uploadFile(file);
+// }
 
-function handleDrop(e) {
-    e.preventDefault();
-    uploadZone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file) uploadFile(file);
-}
+// function handleDrop(e) {
+//     e.preventDefault();
+//     uploadZone.classList.remove('dragover');
+//     const file = e.dataTransfer.files[0];
+//     if (file) uploadFile(file);
+// }
 
-async function uploadFile(file) {
-    const allowed = ['.pdf', '.docx', '.txt'];
-    const ext = '.' + file.name.split('.').pop().toLowerCase();
-    if (!allowed.includes(ext)) {
-        addMessage('ai', `❌ Unsupported file type "${ext}". Please upload PDF, DOCX, or TXT files.`);
-        return;
-    }
+// async function uploadFile(file) {
+//     const allowed = ['.pdf', '.docx', '.txt'];
+//     const ext = '.' + file.name.split('.').pop().toLowerCase();
+//     if (!allowed.includes(ext)) {
+//         addMessage('ai', `❌ Unsupported file type "${ext}". Please upload PDF, DOCX, or TXT files.`);
+//         return;
+//     }
 
-    // Show progress
-    const uploadContent = uploadZone.querySelector('.upload-content');
-    uploadContent.hidden = true;
-    uploadProgress.hidden = false;
-    progressFill.style.width = '30%';
-    progressText.textContent = `Uploading ${file.name}...`;
+//     // Show progress
+//     const uploadContent = uploadZone.querySelector('.upload-content');
+//     uploadContent.hidden = true;
+//     uploadProgress.hidden = false;
+//     progressFill.style.width = '30%';
+//     progressText.textContent = `Uploading ${file.name}...`;
 
-    const formData = new FormData();
-    formData.append('file', file);
+//     const formData = new FormData();
+//     formData.append('file', file);
 
-    try {
-        progressFill.style.width = '60%';
-        progressText.textContent = 'Processing & embedding...';
+//     try {
+//         progressFill.style.width = '60%';
+//         progressText.textContent = 'Processing & embedding...';
 
-        const res = await fetch('/upload', {
-            method: 'POST',
-            body: formData,
-        });
+//         const res = await fetch('/upload', {
+//             method: 'POST',
+//             body: formData,
+//         });
 
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.detail || 'Upload failed');
-        }
+//         if (!res.ok) {
+//             const err = await res.json();
+//             throw new Error(err.detail || 'Upload failed');
+//         }
 
-        const data = await res.json();
-        progressFill.style.width = '100%';
-        progressText.textContent = 'Done!';
+//         const data = await res.json();
+//         progressFill.style.width = '100%';
+//         progressText.textContent = 'Done!';
 
-        // Refresh document list
-        await loadDocuments();
+//         // Refresh document list
+//         await loadDocuments();
 
-        // Select the new document
-        if (data.document && data.document.collection_name) {
-            activeCollection = data.document.collection_name;
-            activeDocHeader.textContent = data.document.filename;
-            headerBadge.hidden = false;
-        }
+//         // Select the new document
+//         if (data.document && data.document.collection_name) {
+//             activeCollection = data.document.collection_name;
+//             activeDocHeader.textContent = data.document.filename;
+//             headerBadge.hidden = false;
+//         }
 
-        addMessage('ai', `✅ **"${file.name}"** has been processed and indexed successfully! You can now ask questions about it.`);
+//         addMessage('ai', `✅ **"${file.name}"** has been processed and indexed successfully! You can now ask questions about it.`);
 
-        // Reset upload UI
-        setTimeout(() => {
-            uploadContent.hidden = false;
-            uploadProgress.hidden = true;
-            progressFill.style.width = '0%';
-        }, 1500);
+//         // Reset upload UI
+//         setTimeout(() => {
+//             uploadContent.hidden = false;
+//             uploadProgress.hidden = true;
+//             progressFill.style.width = '0%';
+//         }, 1500);
 
-    } catch (err) {
-        addMessage('ai', `❌ Failed to process "${file.name}": ${err.message}`);
-        uploadContent.hidden = false;
-        uploadProgress.hidden = true;
-        progressFill.style.width = '0%';
-    }
+//     } catch (err) {
+//         addMessage('ai', `❌ Failed to process "${file.name}": ${err.message}`);
+//         uploadContent.hidden = false;
+//         uploadProgress.hidden = true;
+//         progressFill.style.width = '0%';
+//     }
 
-    // Reset file input
-    fileInput.value = '';
-}
+//     // Reset file input
+//     fileInput.value = '';
+// }
 
 // ── Chat ─────────────────────────────────────────────────
 async function handleSend(e) {

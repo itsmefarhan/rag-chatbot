@@ -1,14 +1,14 @@
-import os
-import shutil
+# import os
+# import shutil
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, UploadFile, File, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from config import UPLOAD_DIR
+# from config import UPLOAD_DIR
 import rag_engine
 
 
@@ -56,37 +56,37 @@ async def chat(body: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/upload")
-async def upload(file: UploadFile = File(...)):
-    # Validate extension
-    allowed = {".pdf", ".docx", ".txt"}
-    ext = os.path.splitext(file.filename)[1].lower()
-    if ext not in allowed:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported file type '{ext}'. Allowed: {', '.join(allowed)}",
-        )
+# @app.post("/upload")
+# async def upload(file: UploadFile = File(...)):
+#     # Validate extension
+#     allowed = {".pdf", ".docx", ".txt"}
+#     ext = os.path.splitext(file.filename)[1].lower()
+#     if ext not in allowed:
+#         raise HTTPException(
+#             status_code=400,
+#             detail=f"Unsupported file type '{ext}'. Allowed: {', '.join(allowed)}",
+#         )
 
-    # Save file
-    save_path = os.path.join(UPLOAD_DIR, file.filename)
-    with open(save_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+#     # Save file
+#     save_path = os.path.join(UPLOAD_DIR, file.filename)
+#     with open(save_path, "wb") as f:
+#         shutil.copyfileobj(file.file, f)
 
-    # Process
-    try:
-        col_name = rag_engine.process_document(save_path, file.filename)
-        docs = rag_engine.get_documents()
-        doc_info = next((d for d in docs if d["collection_name"] == col_name), {})
-        return {
-            "status": "success",
-            "message": f"'{file.filename}' processed successfully",
-            "document": doc_info,
-        }
-    except Exception as e:
-        # Clean up on failure
-        if os.path.exists(save_path):
-            os.remove(save_path)
-        raise HTTPException(status_code=500, detail=str(e))
+#     # Process
+#     try:
+#         col_name = rag_engine.process_document(save_path, file.filename)
+#         docs = rag_engine.get_documents()
+#         doc_info = next((d for d in docs if d["collection_name"] == col_name), {})
+#         return {
+#             "status": "success",
+#             "message": f"'{file.filename}' processed successfully",
+#             "document": doc_info,
+#         }
+#     except Exception as e:
+#         # Clean up on failure
+#         if os.path.exists(save_path):
+#             os.remove(save_path)
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/documents")
